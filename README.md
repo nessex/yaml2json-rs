@@ -2,6 +2,8 @@
 
 Because one more implementation can't hurt...
 
+This implementation relies entirely on [Serde](https://github.com/serde-rs/serde) to provide fast and correct serialization and deserialization. In naïve tests, this provided a significant speed improvement over other implementations, though your mileage may vary.
+
 ## Installation
 ```
 cargo install --git https://github.com/Nessex/yaml2json.git yaml2json
