@@ -7,10 +7,10 @@ use serde::{Serialize};
 use std::io;
 
 fn main() {
-    let matches = App::new("yaml2json")
+    let matches = App::new(crate_name!())
         .version(crate_version!())
-        .author("Nathan Essex <nathan@essex.id.au>")
-        .about("Converts YAML to JSON")
+        .author(crate_authors!())
+        .about(crate_description!())
         .arg(
             Arg::with_name("pretty")
                 .takes_value(false)
