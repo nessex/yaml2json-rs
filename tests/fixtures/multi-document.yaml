@@ -1,0 +1,24 @@
+---
+abc: "def"
+ghi: "jkl"
+a-thing:
+  another-thing:
+    another-thing:
+      finally: 123
+---
+a-second-one: "but I bet you've never seen the next line in the wild"
+...
+---
+a-third-one: 123
+...
+
+%YAML 1.2
+---
+a-fourth-one: "just-in-case"
+...
+
+%YAML 1.2
+---
+...
+---
+a-fifth-one: "5"
