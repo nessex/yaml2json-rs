@@ -1,9 +1,10 @@
 [package]
-name = "yaml2json"
+name = "yaml2json-rs"
 description = "Convert YAML documents to JSON"
 version = "0.2.0"
 authors = ["Nathan Essex <nathan@essex.id.au>"]
 edition = "2018"
+license = "Apache-2.0 OR MIT"
 
 [dependencies]
 serde = "1.0"

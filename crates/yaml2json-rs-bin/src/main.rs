@@ -11,7 +11,7 @@ use std::str::FromStr;
 
 use clap::{App, Arg};
 
-use yaml2json::{Style, Yaml2Json};
+use yaml2json_rs::{Style, Yaml2Json};
 use yaml_split::DocumentIterator;
 use std::error::Error;
 

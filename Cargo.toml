@@ -1,7 +1,7 @@
 [workspace]
 
 members = [
-    "crates/yaml2json",
-    "crates/yaml2json-bin",
+    "crates/yaml2json-rs",
+    "crates/yaml2json-rs-bin",
     "crates/yaml-split",
 ]
