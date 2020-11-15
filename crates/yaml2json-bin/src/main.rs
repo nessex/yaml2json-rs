@@ -139,7 +139,7 @@ fn main() {
     let yaml2json_style = if pretty { Style::PRETTY } else { Style::COMPACT };
     let yaml2json = Yaml2Json::new(yaml2json_style);
 
-    // If files are provided as arguments, read those
+    // if: files are provided as arguments, read those instead of stdin
     if let Some(files) = fileopt {
         for f in files {
             let path = Path::new(f);
@@ -155,7 +155,7 @@ fn main() {
                 write(&yaml2json, &ep, buffered);
             }
         }
-    // else: No files provided, use stdin for input
+    // else: No files provided as args, use stdin for input
     } else {
         let stdin = io::stdin();
         let stdin_lock = stdin.lock();
