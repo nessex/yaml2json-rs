@@ -1,4 +1,4 @@
-use std::io::{BufRead};
+use std::io::BufRead;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -14,7 +14,7 @@ pub struct DocumentIterator<'a> {
     prepend_next: Option<String>,
 }
 
-impl <'a>DocumentIterator<'a> {
+impl<'a> DocumentIterator<'a> {
     pub fn new(reader: impl BufRead + 'a) -> DocumentIterator<'a> {
         DocumentIterator {
             reader: Box::new(reader),
@@ -76,7 +76,7 @@ impl Iterator for DocumentIterator<'_> {
                                 self.disambiguated = true;
                                 self.in_header = true;
                                 break;
-                            },
+                            }
                             // anything else must mean we are in a bare document
                             _ => {
                                 self.disambiguated = true;
@@ -88,7 +88,7 @@ impl Iterator for DocumentIterator<'_> {
 
                     // Append the current line to the document
                     current_file = String::new() + current_file.as_str() + buf.as_str();
-                },
+                }
                 Err(e) => {
                     return Some(Err(e.into()));
                 }
@@ -147,8 +147,8 @@ impl Iterator for DocumentIterator<'_> {
 
 #[cfg(test)]
 mod tests {
-    use std::io::{BufReader};
     use crate::DocumentIterator;
+    use std::io::BufReader;
 
     fn str_reader(s: &[u8]) -> BufReader<&[u8]> {
         BufReader::new(s)
@@ -179,10 +179,13 @@ abc: def
         let mut doc_iter = DocumentIterator::new(reader);
 
         let next = doc_iter.next().unwrap().unwrap();
-        assert_eq!(next.as_str(), r#"
+        assert_eq!(
+            next.as_str(),
+            r#"
 ---
 abc: def
-"#);
+"#
+        );
 
         let fin = doc_iter.next().is_none();
         assert_eq!(true, fin);
@@ -200,11 +203,14 @@ abc: def
         let mut doc_iter = DocumentIterator::new(reader);
 
         let next = doc_iter.next().unwrap().unwrap();
-        assert_eq!(next.as_str(), r#"
+        assert_eq!(
+            next.as_str(),
+            r#"
 %YAML 1.2
 ---
 abc: def
-"#);
+"#
+        );
 
         let fin = doc_iter.next().is_none();
         assert_eq!(true, fin);
@@ -224,9 +230,12 @@ aaa: bbb
         assert_eq!(next.as_str(), "abc: def\n");
 
         next = doc_iter.next().unwrap().unwrap();
-        assert_eq!(next.as_str(), r#"---
+        assert_eq!(
+            next.as_str(),
+            r#"---
 aaa: bbb
-"#);
+"#
+        );
 
         let fin = doc_iter.next().is_none();
         assert_eq!(true, fin);
@@ -248,17 +257,23 @@ aaa: bbb
         let mut doc_iter = DocumentIterator::new(reader);
 
         let mut next = doc_iter.next().unwrap().unwrap();
-        assert_eq!(next.as_str(), r#"%YAML 1.2
+        assert_eq!(
+            next.as_str(),
+            r#"%YAML 1.2
 ---
 abc: def
-"#);
+"#
+        );
 
         next = doc_iter.next().unwrap().unwrap();
-        assert_eq!(next.as_str(), r#"
+        assert_eq!(
+            next.as_str(),
+            r#"
 %YAML 1.2
 ---
 aaa: bbb
-"#);
+"#
+        );
 
         let fin = doc_iter.next().is_none();
         assert_eq!(true, fin);
@@ -284,28 +299,43 @@ final: "document"
         let mut doc_iter = DocumentIterator::new(reader);
 
         let mut next = doc_iter.next().unwrap().unwrap();
-        assert_eq!(next.as_str(), r#"%YAML 1.2
+        assert_eq!(
+            next.as_str(),
+            r#"%YAML 1.2
 ---
 abc: def
-"#);
+"#
+        );
 
         next = doc_iter.next().unwrap().unwrap();
-        assert_eq!(next.as_str(), r#"---
+        assert_eq!(
+            next.as_str(),
+            r#"---
 %YAML: "not a real directive"
-"#);
+"#
+        );
         next = doc_iter.next().unwrap().unwrap();
-        assert_eq!(next.as_str(), r#"---
+        assert_eq!(
+            next.as_str(),
+            r#"---
 aaa: bbb
-"#      );
+"#
+        );
 
         next = doc_iter.next().unwrap().unwrap();
-        assert_eq!(next.as_str(), r#"---
-"#);
+        assert_eq!(
+            next.as_str(),
+            r#"---
+"#
+        );
 
         next = doc_iter.next().unwrap().unwrap();
-        assert_eq!(next.as_str(), r#"---
+        assert_eq!(
+            next.as_str(),
+            r#"---
 final: "document"
-"#);
+"#
+        );
 
         let fin = doc_iter.next().is_none();
         assert_eq!(true, fin);

@@ -5,15 +5,15 @@ extern crate clap;
 
 use std::fs::File;
 use std::io;
-use std::io::{BufReader, BufRead, Write};
+use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
 use std::str::FromStr;
 
 use clap::{App, Arg};
 
+use std::error::Error;
 use yaml2json_rs::{Style, Yaml2Json};
 use yaml_split::DocumentIterator;
-use std::error::Error;
 
 enum ErrorStyle {
     SILENT,
@@ -40,7 +40,8 @@ impl ToString for ErrorStyle {
             ErrorStyle::SILENT => "silent",
             ErrorStyle::STDERR => "stderr",
             ErrorStyle::JSON => "json",
-        }.to_string()
+        }
+        .to_string()
     }
 }
 
@@ -50,14 +51,12 @@ struct ErrorPrinter {
 
 impl ErrorPrinter {
     fn new(print_style: ErrorStyle) -> Self {
-        Self {
-            print_style,
-        }
+        Self { print_style }
     }
 
     fn print(&self, err: impl Error) {
         match self.print_style {
-            ErrorStyle::SILENT => return,
+            ErrorStyle::SILENT => {}
             ErrorStyle::STDERR => eprintln!("{}", err),
             ErrorStyle::JSON => println!("{{\"yaml-error\":\"{}\"}}", err),
         };
@@ -65,7 +64,7 @@ impl ErrorPrinter {
 
     fn print_string(&self, s: String) {
         match self.print_style {
-            ErrorStyle::SILENT => return,
+            ErrorStyle::SILENT => {}
             ErrorStyle::STDERR => eprintln!("{}", s),
             ErrorStyle::JSON => println!("{{\"yaml-error\":\"{}\"}}", s),
         };
@@ -82,7 +81,7 @@ fn write(yaml2json: &Yaml2Json, ep: &ErrorPrinter, buf: impl BufRead) {
             first = false;
         } else {
             match stdout.write(b"\n") {
-                Ok(_) => {},
+                Ok(_) => {}
                 Err(e) => ep.print(e),
             };
         }
@@ -93,11 +92,11 @@ fn write(yaml2json: &Yaml2Json, ep: &ErrorPrinter, buf: impl BufRead) {
                 .unwrap_or_else(|e| ep.print(e)),
             Err(e) => ep.print(e),
         }
-    };
+    }
 
     // Add final newline
     match stdout.write(b"\n") {
-        Ok(_) => {},
+        Ok(_) => {}
         Err(e) => ep.print(e),
     };
 }
@@ -142,7 +141,11 @@ fn main() {
     let error = matches.value_of("error").unwrap();
 
     let ep = ErrorPrinter::new(ErrorStyle::from_str(error).unwrap());
-    let yaml2json_style = if pretty { Style::PRETTY } else { Style::COMPACT };
+    let yaml2json_style = if pretty {
+        Style::PRETTY
+    } else {
+        Style::COMPACT
+    };
     let yaml2json = Yaml2Json::new(yaml2json_style);
 
     // if: files are provided as arguments, read those instead of stdin
@@ -151,14 +154,23 @@ fn main() {
             let path = Path::new(f);
 
             if !path.exists() {
-                ep.print_string(format!("file {} does not exist", path.display().to_string()));
+                ep.print_string(format!(
+                    "file {} does not exist",
+                    path.display().to_string()
+                ));
             } else if path.is_dir() {
                 ep.print_string(format!("{} is a directory", path.display().to_string()))
             } else {
-                let file = File::open(f).expect(format!("Cannot read file: {}", f).as_str());
-                let buffered = BufReader::new(file);
+                let file = File::open(f);
 
-                write(&yaml2json, &ep, buffered);
+                match file {
+                    Ok(f) => {
+                        let buffered = BufReader::new(f);
+
+                        write(&yaml2json, &ep, buffered);
+                    }
+                    Err(e) => ep.print(e),
+                }
             }
         }
     // else: No files provided as args, use stdin for input

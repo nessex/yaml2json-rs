@@ -1,7 +1,7 @@
-use std::io;
 use crate::Style::{COMPACT, PRETTY};
-use thiserror::Error;
 use core::fmt::Debug;
+use std::io;
+use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum Yaml2JsonError {
@@ -26,9 +26,7 @@ pub struct Yaml2Json {
 
 impl Yaml2Json {
     pub fn new(style: Style) -> Self {
-        Self {
-            style,
-        }
+        Self { style }
     }
 
     pub fn document_to_string(&self, document: String) -> Result<String, Yaml2JsonError> {
@@ -45,12 +43,16 @@ impl Yaml2Json {
         }
     }
 
-    pub fn document_to_writer<W: io::Write>(&self, document: String, w: &mut W) -> Result<(), Yaml2JsonError> {
+    pub fn document_to_writer<W: io::Write>(
+        &self,
+        document: String,
+        w: &mut W,
+    ) -> Result<(), Yaml2JsonError> {
         let s: serde_json::Value = serde_yaml::from_str(document.as_str())?;
 
         let res = match self.style {
-            PRETTY => serde_json::to_writer_pretty(w,&s),
-            COMPACT => serde_json::to_writer(w,&s),
+            PRETTY => serde_json::to_writer_pretty(w, &s),
+            COMPACT => serde_json::to_writer(w, &s),
         };
 
         match res {
@@ -62,13 +64,14 @@ impl Yaml2Json {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Yaml2Json, Style};
+    use crate::{Style, Yaml2Json};
     use std::io::Cursor;
 
     #[test]
     fn document_to_string_compact() {
         let yaml2json = Yaml2Json::new(Style::COMPACT);
-        let input = String::new() + r#"
+        let input = String::new()
+            + r#"
 ---
 abc: def
 "#;
@@ -80,11 +83,13 @@ abc: def
     #[test]
     fn document_to_string_pretty() {
         let yaml2json = Yaml2Json::new(Style::PRETTY);
-        let input = String::new() + r#"
+        let input = String::new()
+            + r#"
 ---
 abc: def
 "#;
-        let expected = String::new() + r#"{
+        let expected = String::new()
+            + r#"{
   "abc": "def"
 }"#;
         let res = yaml2json.document_to_string(input).unwrap();
@@ -94,7 +99,8 @@ abc: def
     #[test]
     fn document_to_stream_compact() {
         let yaml2json = Yaml2Json::new(Style::COMPACT);
-        let input = String::new() + r#"
+        let input = String::new()
+            + r#"
 ---
 abc: def
 "#;
@@ -110,11 +116,13 @@ abc: def
     #[test]
     fn document_to_stream_pretty() {
         let yaml2json = Yaml2Json::new(Style::PRETTY);
-        let input = String::new() + r#"
+        let input = String::new()
+            + r#"
 ---
 abc: def
 "#;
-        let expected = String::new() + r#"{
+        let expected = String::new()
+            + r#"{
   "abc": "def"
 }"#;
 
