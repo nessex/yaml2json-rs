@@ -45,7 +45,7 @@ impl Yaml2Json {
         }
     }
 
-    pub fn document_to_writer(&self, document: String, w: impl io::Write) -> Result<(), Yaml2JsonError> {
+    pub fn document_to_writer<W: io::Write>(&self, document: String, w: &mut W) -> Result<(), Yaml2JsonError> {
         let s: serde_json::Value = serde_yaml::from_str(document.as_str())?;
 
         let res = match self.style {

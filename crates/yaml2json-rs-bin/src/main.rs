@@ -5,7 +5,7 @@ extern crate clap;
 
 use std::fs::File;
 use std::io;
-use std::io::{BufReader, BufRead};
+use std::io::{BufReader, BufRead, Write};
 use std::path::Path;
 use std::str::FromStr;
 
@@ -75,25 +75,25 @@ impl ErrorPrinter {
 fn write(yaml2json: &Yaml2Json, ep: &ErrorPrinter, buf: impl BufRead) {
     let doc_iter = DocumentIterator::new(buf);
     let mut first = true;
+    let mut stdout = io::stdout();
 
     for res in doc_iter {
         if first {
             first = false;
         } else {
-            // Add newline
-            println!();
+            stdout.write(b"\n");
         }
 
         match res {
             Ok(doc) => yaml2json
-                .document_to_writer(doc, io::stdout())
+                .document_to_writer(doc, &mut stdout)
                 .unwrap_or_else(|e| ep.print(e)),
             Err(e) => ep.print(e),
         }
     };
 
     // Add final newline
-    println!();
+    stdout.write(b"\n");
 }
 
 fn main() {
