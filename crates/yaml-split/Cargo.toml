@@ -1,10 +1,14 @@
 [package]
 name = "yaml-split"
 description = "provides an iterator over individual YAML documents in a YAML file or stream"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Nathan Essex <nathan@essex.id.au>"]
 edition = "2018"
 license = "Apache-2.0 OR MIT"
+repository = "https://github.com/Nessex/yaml2json-rs"
+homepage = "https://github.com/Nessex/yaml2json-rs/blob/master/crates/yaml-split"
+categories = ["encoding"]
+documentation = "https://docs.rs/yaml-split/"
 
 [dependencies]
 thiserror = "1.0.22"

@@ -1,10 +1,15 @@
 [package]
 name = "yaml2json-rs-bin"
 description = "Utility to convert YAML files to JSON"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Nathan Essex <nathan@essex.id.au>"]
 edition = "2018"
 license = "Apache-2.0 OR MIT"
+repository = "https://github.com/Nessex/yaml2json-rs"
+homepage = "https://github.com/Nessex/yaml2json-rs"
+categories = ["command-line-utilities", "encoding"]
+documentation = "https://docs.rs/yaml2json-rs/"
+readme = "../../README.md"
 
 [dependencies]
 clap = "2.33.3"
