@@ -63,9 +63,7 @@ impl Yaml2Json {
 #[cfg(test)]
 mod tests {
     use crate::{Yaml2Json, Style};
-    use std::io::{BufReader, Read, BufWriter, Write, stdout, Cursor};
-    use std::sync::Arc;
-    use std::rc::Rc;
+    use std::io::Cursor;
 
     #[test]
     fn document_to_string_compact() {

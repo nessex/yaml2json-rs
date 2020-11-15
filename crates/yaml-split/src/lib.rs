@@ -29,7 +29,7 @@ impl Iterator for DocumentIterator<'_> {
     type Item = Result<String, YamlSplitError>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let mut buf = String::new();
+        let mut buf: String;
         let mut current_file = match &self.prepend_next {
             Some(next) => String::new() + next.as_str(),
             None => String::new(),

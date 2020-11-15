@@ -81,7 +81,10 @@ fn write(yaml2json: &Yaml2Json, ep: &ErrorPrinter, buf: impl BufRead) {
         if first {
             first = false;
         } else {
-            stdout.write(b"\n");
+            match stdout.write(b"\n") {
+                Ok(_) => {},
+                Err(e) => ep.print(e),
+            };
         }
 
         match res {
@@ -93,7 +96,10 @@ fn write(yaml2json: &Yaml2Json, ep: &ErrorPrinter, buf: impl BufRead) {
     };
 
     // Add final newline
-    stdout.write(b"\n");
+    match stdout.write(b"\n") {
+        Ok(_) => {},
+        Err(e) => ep.print(e),
+    };
 }
 
 fn main() {
