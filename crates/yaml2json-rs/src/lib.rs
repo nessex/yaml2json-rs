@@ -97,7 +97,7 @@ abc: def
     }
 
     #[test]
-    fn document_to_stream_compact() {
+    fn document_to_writer_compact() {
         let yaml2json = Yaml2Json::new(Style::COMPACT);
         let input = String::new()
             + r#"
@@ -114,7 +114,7 @@ abc: def
     }
 
     #[test]
-    fn document_to_stream_pretty() {
+    fn document_to_writer_pretty() {
         let yaml2json = Yaml2Json::new(Style::PRETTY);
         let input = String::new()
             + r#"
