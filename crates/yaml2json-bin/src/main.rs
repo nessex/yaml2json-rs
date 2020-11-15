@@ -5,7 +5,7 @@ extern crate clap;
 
 use std::fs::File;
 use std::io;
-use std::io::{BufReader};
+use std::io::{BufReader, BufRead};
 use std::path::Path;
 use std::str::FromStr;
 
@@ -13,6 +13,7 @@ use clap::{App, Arg};
 
 use yaml2json::{Style, Yaml2Json};
 use yaml_split::DocumentIterator;
+use std::error::Error;
 
 enum ErrorStyle {
     SILENT,
@@ -25,11 +26,21 @@ impl FromStr for ErrorStyle {
 
     fn from_str(s: &str) -> core::result::Result<Self, Self::Err> {
         match s {
-            "silent" | "none" => Ok(ErrorStyle::SILENT),
+            "silent" => Ok(ErrorStyle::SILENT),
             "stderr" => Ok(ErrorStyle::STDERR),
             "json" => Ok(ErrorStyle::JSON),
             _ => bail!("not a valid ErrorStyle"),
         }
+    }
+}
+
+impl ToString for ErrorStyle {
+    fn to_string(&self) -> String {
+        match self {
+            ErrorStyle::SILENT => "silent",
+            ErrorStyle::STDERR => "stderr",
+            ErrorStyle::JSON => "json",
+        }.to_string()
     }
 }
 
@@ -44,20 +55,59 @@ impl ErrorPrinter {
         }
     }
 
-    fn print(&self, err: String) {
+    fn print(&self, err: impl Error) {
         match self.print_style {
             ErrorStyle::SILENT => return,
             ErrorStyle::STDERR => eprintln!("{}", err),
-            ErrorStyle::JSON => println!("{{\"yaml-error\":\"{}\"}}", err.to_string()),
+            ErrorStyle::JSON => println!("{{\"yaml-error\":\"{}\"}}", err),
+        };
+    }
+
+    fn print_string(&self, s: String) {
+        match self.print_style {
+            ErrorStyle::SILENT => return,
+            ErrorStyle::STDERR => eprintln!("{}", s),
+            ErrorStyle::JSON => println!("{{\"yaml-error\":\"{}\"}}", s),
         };
     }
 }
 
+fn write(yaml2json: &Yaml2Json, ep: &ErrorPrinter, buf: impl BufRead) {
+    let doc_iter = DocumentIterator::new(buf);
+    let mut first = true;
+
+    for res in doc_iter {
+        if first {
+            first = false;
+        } else {
+            // Add newline
+            println!();
+        }
+
+        match res {
+            Ok(doc) => yaml2json
+                .document_to_writer(doc, io::stdout())
+                .unwrap_or_else(|e| ep.print(e)),
+            Err(e) => ep.print(e),
+        }
+    };
+
+    // Add final newline
+    println!();
+}
+
 fn main() {
+    let default_err_style = ErrorStyle::STDERR.to_string();
+    let usage = r#"./yaml2json file1.yaml file2.yaml
+
+    cat file1.yaml | ./yaml2json
+
+    ./yaml2json --error=json file1.yaml | jq"#;
     let matches = App::new(crate_name!())
         .version(crate_version!())
         .author(crate_authors!())
         .about(crate_description!())
+        .usage(usage)
         .arg(
             Arg::with_name("pretty")
                 .takes_value(false)
@@ -69,14 +119,14 @@ fn main() {
                 .takes_value(true)
                 .short("e")
                 .long("error")
-                .default_value("stderr")
-                .possible_value("stderr")
-                .possible_value("none")
-                .possible_value("json")
+                .default_value(default_err_style.as_str())
+                .possible_value(ErrorStyle::SILENT.to_string().as_str())
+                .possible_value(ErrorStyle::STDERR.to_string().as_str())
+                .possible_value(ErrorStyle::JSON.to_string().as_str())
         )
         .arg(
             Arg::with_name("file")
-                .help("Specify the path to files you want to convert")
+                .help("Specify the path to files you want to convert. You can also pass files via stdin instead.")
                 .multiple(true)
         )
         .get_matches();
@@ -85,60 +135,31 @@ fn main() {
     let pretty = matches.is_present("pretty");
     let error = matches.value_of("error").unwrap();
 
-    let eprinter = ErrorPrinter::new(ErrorStyle::from_str(error).unwrap());
-
+    let ep = ErrorPrinter::new(ErrorStyle::from_str(error).unwrap());
     let yaml2json_style = if pretty { Style::PRETTY } else { Style::COMPACT };
     let yaml2json = Yaml2Json::new(yaml2json_style);
 
-    let mut first = true;
-
+    // If files are provided as arguments, read those
     if let Some(files) = fileopt {
         for f in files {
             let path = Path::new(f);
-            if path.exists() {
+
+            if !path.exists() {
+                ep.print_string(format!("file {} does not exist", path.display().to_string()));
+            } else if path.is_dir() {
+                ep.print_string(format!("{} is a directory", path.display().to_string()))
+            } else {
                 let file = File::open(f).expect(format!("Cannot read file: {}", f).as_str());
                 let buffered = BufReader::new(file);
 
-                let doc_iter = DocumentIterator::new(buffered);
-
-                for res in doc_iter {
-                    match res {
-                        Ok(doc) => match yaml2json.document_to_writer(doc, io::stdout()) {
-                            Ok(_) => {}
-                            Err(e) => eprinter.print(e.to_string()),
-                        },
-                        Err(e) => eprinter.print(e.to_string()),
-                    };
-                }
-            } else {
-                eprinter.print(format!("file {} does not exist", path.to_str().unwrap()));
+                write(&yaml2json, &ep, buffered);
             }
         }
-
-        eprinter.print(format!("no valid input"))
+    // else: No files provided, use stdin for input
     } else {
         let stdin = io::stdin();
         let stdin_lock = stdin.lock();
 
-        let doc_iter = DocumentIterator::new(stdin_lock);
-        for res in doc_iter {
-            if first {
-                first = false;
-            } else {
-                // Add newline
-                eprintln!();
-            }
-
-            match res {
-                Ok(doc) => match yaml2json.document_to_writer(doc, io::stdout()) {
-                    Ok(_) => {}
-                    Err(e) => eprinter.print(e.to_string()),
-                },
-                Err(e) => eprinter.print(e.to_string()),
-            };
-        }
+        write(&yaml2json, &ep, stdin_lock);
     }
-
-    // Add newline
-    eprintln!();
 }
