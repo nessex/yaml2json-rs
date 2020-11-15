@@ -59,3 +59,71 @@ impl Yaml2Json {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{Yaml2Json, Style};
+    use std::io::{BufReader, Read, BufWriter, Write, stdout, Cursor};
+    use std::sync::Arc;
+    use std::rc::Rc;
+
+    #[test]
+    fn document_to_string_compact() {
+        let yaml2json = Yaml2Json::new(Style::COMPACT);
+        let input = String::new() + r#"
+---
+abc: def
+"#;
+        let expected = String::new() + r#"{"abc":"def"}"#;
+        let res = yaml2json.document_to_string(input).unwrap();
+        assert_eq!(expected, res);
+    }
+
+    #[test]
+    fn document_to_string_pretty() {
+        let yaml2json = Yaml2Json::new(Style::PRETTY);
+        let input = String::new() + r#"
+---
+abc: def
+"#;
+        let expected = String::new() + r#"{
+  "abc": "def"
+}"#;
+        let res = yaml2json.document_to_string(input).unwrap();
+        assert_eq!(expected, res);
+    }
+
+    #[test]
+    fn document_to_stream_compact() {
+        let yaml2json = Yaml2Json::new(Style::COMPACT);
+        let input = String::new() + r#"
+---
+abc: def
+"#;
+        let expected = String::new() + r#"{"abc":"def"}"#;
+
+        let mut buf = Cursor::new(Vec::<u8>::new());
+        yaml2json.document_to_writer(input, buf.get_mut()).unwrap();
+
+        let res = String::from_utf8(buf.into_inner()).unwrap();
+        assert_eq!(expected, res);
+    }
+
+    #[test]
+    fn document_to_stream_pretty() {
+        let yaml2json = Yaml2Json::new(Style::PRETTY);
+        let input = String::new() + r#"
+---
+abc: def
+"#;
+        let expected = String::new() + r#"{
+  "abc": "def"
+}"#;
+
+        let mut buf = Cursor::new(Vec::<u8>::new());
+        yaml2json.document_to_writer(input, buf.get_mut()).unwrap();
+
+        let res = String::from_utf8(buf.into_inner()).unwrap();
+        assert_eq!(expected, res);
+    }
+}
