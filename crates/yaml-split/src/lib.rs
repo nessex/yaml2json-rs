@@ -1,4 +1,4 @@
-use std::io::BufRead;
+use std::io::{BufRead, BufReader, Read};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -7,17 +7,22 @@ pub enum YamlSplitError {
     IOError(#[from] std::io::Error),
 }
 
-pub struct DocumentIterator<'a> {
-    reader: Box<dyn BufRead + 'a>,
+pub struct DocumentIterator<R>
+where
+    R: Read,
+{
+    reader: BufReader<R>,
     disambiguated: bool,
     in_header: bool,
     prepend_next: Option<String>,
 }
 
-impl<'a> DocumentIterator<'a> {
-    pub fn new(reader: impl BufRead + 'a) -> DocumentIterator<'a> {
+impl<'a, R: Read + 'a> DocumentIterator<R> {
+    pub fn new(reader: R) -> DocumentIterator<R> {
+        let br = BufReader::new(reader);
+
         DocumentIterator {
-            reader: Box::new(reader),
+            reader: br,
             disambiguated: false,
             in_header: false,
             prepend_next: None,
@@ -25,7 +30,7 @@ impl<'a> DocumentIterator<'a> {
     }
 }
 
-impl Iterator for DocumentIterator<'_> {
+impl<R: Read> Iterator for DocumentIterator<R> {
     type Item = Result<String, YamlSplitError>;
 
     fn next(&mut self) -> Option<Self::Item> {

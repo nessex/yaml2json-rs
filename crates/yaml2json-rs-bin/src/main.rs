@@ -5,7 +5,7 @@ extern crate clap;
 
 use std::fs::File;
 use std::io;
-use std::io::{BufRead, BufReader, Write};
+use std::io::{Read, Write};
 use std::path::Path;
 use std::str::FromStr;
 
@@ -71,8 +71,8 @@ impl ErrorPrinter {
     }
 }
 
-fn write(yaml2json: &Yaml2Json, ep: &ErrorPrinter, buf: impl BufRead) {
-    let doc_iter = DocumentIterator::new(buf);
+fn write(yaml2json: &Yaml2Json, ep: &ErrorPrinter, read: impl Read) {
+    let doc_iter = DocumentIterator::new(read);
     let mut first = true;
     let mut stdout = io::stdout();
 
@@ -165,9 +165,7 @@ fn main() {
 
                 match file {
                     Ok(f) => {
-                        let buffered = BufReader::new(f);
-
-                        write(&yaml2json, &ep, buffered);
+                        write(&yaml2json, &ep, f);
                     }
                     Err(e) => ep.print(e),
                 }
