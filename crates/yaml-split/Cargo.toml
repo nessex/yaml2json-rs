@@ -1,6 +1,6 @@
 [package]
 name = "yaml-split"
-description = "splits a YAML string into separate files"
+description = "provides an iterator over individual YAML documents in a YAML file or stream"
 version = "0.2.0"
 authors = ["Nathan Essex <nathan@essex.id.au>"]
 edition = "2018"

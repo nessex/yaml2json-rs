@@ -1,6 +1,6 @@
 [package]
 name = "yaml2json"
-description = "Convert YAML files to JSON"
+description = "Convert YAML documents to JSON"
 version = "0.2.0"
 authors = ["Nathan Essex <nathan@essex.id.au>"]
 edition = "2018"
