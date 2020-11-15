@@ -1,0 +1,13 @@
+[package]
+name = "yaml2json-rs-bin"
+description = "Utility to convert YAML files to JSON"
+version = "0.2.0"
+authors = ["Nathan Essex <nathan@essex.id.au>"]
+edition = "2018"
+license = "Apache-2.0 OR MIT"
+
+[dependencies]
+clap = "2.33.3"
+anyhow = "1.0.34"
+yaml-split = { path = "../yaml-split" }
+yaml2json-rs = { path = "../yaml2json-rs" }
