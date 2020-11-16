@@ -7,6 +7,84 @@ pub enum YamlSplitError {
     IOError(#[from] std::io::Error),
 }
 
+/// `DocumentIterator` is an iterator over individual YAML documents in a file or stream.
+///
+/// For example, the following YAML file contains two separate documents:
+/// ```yaml
+/// hello: world
+/// ---
+/// hello: rust
+/// ```
+///
+/// The first item in this iterator will be:
+/// ```yaml
+/// hello: world
+/// ```
+///
+/// The second item will be (the "header" / directives end marker "---" is considered part of the document):
+/// ```yaml
+/// ---
+/// hello: rust
+/// ```
+///
+/// Each item's output will be suitable for passing to `serde-yaml`, `yaml-rust` or
+/// similar libraries for parsing. Each item can also be an error, letting you opt for
+/// safe handling of errors when dealing with lots of files.
+///
+/// ```
+/// use std::fs::File;
+/// use yaml_split::DocumentIterator;
+/// # use std::io::Write;
+/// #
+/// # File::create("test.yaml").unwrap();
+/// # let mut file = File::open("test.yaml").unwrap();
+/// # file.write(b"hello: world");
+///
+/// let read_file = File::open("test.yaml").unwrap();
+/// let doc_iter = DocumentIterator::new(read_file);
+///
+/// for doc in doc_iter {
+///     println!("{}", doc.unwrap());
+/// }
+/// ```
+///
+/// This also correctly handles less common areas of the YAML spec including
+/// directives, comments and document end markers.
+///
+/// ```
+/// use yaml_split::DocumentIterator;
+///
+/// let input = r#"
+///
+/// ## a header comment
+/// %YAML 1.2
+/// ---
+/// hello: world
+/// ...
+/// ---
+/// hello: rust
+/// ---
+/// ## a body comment
+/// hello: everyone
+/// "#;
+///
+/// let mut doc_iter = DocumentIterator::new(input.as_bytes());
+///
+/// assert_eq!(r#"
+///
+/// ## a header comment
+/// %YAML 1.2
+/// ---
+/// hello: world
+/// "#, doc_iter.next().unwrap().unwrap());
+/// assert_eq!(r#"---
+/// hello: rust
+/// "#, doc_iter.next().unwrap().unwrap());
+/// assert_eq!(r#"---
+/// ## a body comment
+/// hello: everyone
+/// "#, doc_iter.next().unwrap().unwrap());
+/// ```
 pub struct DocumentIterator<R>
 where
     R: Read,
@@ -18,6 +96,50 @@ where
 }
 
 impl<'a, R: Read + 'a> DocumentIterator<R> {
+    /// `new()` creates a new DocumentIterator over a given `reader`'s contents.
+    ///
+    /// This reader can be a reader for a file:
+    /// ```
+    /// use std::fs::File;
+    /// use yaml_split::DocumentIterator;
+    /// # use std::io::Write;
+    /// #
+    /// # File::create("test.yaml").unwrap();
+    /// # let mut file = File::open("test.yaml").unwrap();
+    /// # file.write(b"hello: world");
+    ///
+    /// let read_file = File::open("test.yaml").unwrap();
+    /// let doc_iter = DocumentIterator::new(read_file);
+    ///
+    /// for doc in doc_iter {
+    ///     println!("{}", doc.unwrap());
+    /// }
+    /// ```
+    ///
+    /// Or the reader can be a simple byte array (useful for strings):
+    /// ```
+    /// use yaml_split::DocumentIterator;
+    /// let yaml = r#"
+    /// hello: world
+    /// ---
+    /// hello: rust
+    /// "#;
+    ///
+    /// let mut doc_iter = DocumentIterator::new(yaml.as_bytes());
+    ///
+    /// assert_eq!(r#"
+    /// hello: world
+    /// "#, doc_iter.next().unwrap().unwrap());
+    /// assert_eq!(r#"---
+    /// hello: rust
+    /// "#, doc_iter.next().unwrap().unwrap());
+    /// assert_eq!(true, doc_iter.next().is_none());
+    ///
+    /// // or in a loop:
+    /// for doc in doc_iter {
+    ///     println!("{}", doc.unwrap());
+    /// }
+    /// ```
     pub fn new(reader: R) -> DocumentIterator<R> {
         let br = BufReader::new(reader);
 
