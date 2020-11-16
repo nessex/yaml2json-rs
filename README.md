@@ -11,8 +11,12 @@ There are many implementations of this idea, with various limitations. This one 
 This implementation relies heavily on the existing work in [Serde](https://github.com/serde-rs/serde), [yaml-rust](https://github.com/chyh1990/yaml-rust) and others to provide fast and correct serialization and deserialization. In naïve tests, this provided a significant speed improvement over other implementations, though your mileage may vary.
 
 ## Installation
+
+Download pre-compiled binaries from the [Releases Page](https://github.com/Nessex/yaml2json-rs/releases/).
+
+Or, install via `cargo`:
 ```
-cargo install --git https://github.com/Nessex/yaml2json-rs.git --bin yaml2json
+cargo install yaml2json-rs-bin --bin yaml2json
 ```
 
 ## Usage
