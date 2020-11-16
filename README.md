@@ -73,6 +73,3 @@ Please consider supporting the amazing libraries that make this work:
  * [anyhow](https://github.com/dtolnay/anyhow)
  * [thiserror](https://github.com/dtolnay/thiserror)
  * [clap](https://github.com/clap-rs/clap)
-
-This project is not affiliated with the projects above, however they are entirely responsible for any successes this project has. Failures are our own.
- 
