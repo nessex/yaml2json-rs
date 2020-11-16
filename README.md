@@ -42,6 +42,13 @@ ARGS:
     <file>...    Specify the path to files you want to convert. You can also pass files via stdin instead.
 ```
 
+For best results when dealing with multiple documents, pass multiple files in at once by path:
+
+```
+# Be sure to use + and not \; with find
+find . -name '*.yaml' -exec yaml2json {} +
+```
+
 ## Crates
 
 | crate | links | description |
