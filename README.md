@@ -40,11 +40,11 @@ ARGS:
 
 ## Crates
 
-| crate | description |
-| --- | --- |
-| yaml2json-rs | A library wrapping [serde-yaml](https://github.com/dtolnay/serde-yaml) and [serde-json](https://github.com/serde-rs/json) to convert a single YAML document to JSON |
-| yaml2json-rs-bin | A utility to convert YAML to JSON |
-| yaml-split | A library providing an iterator over individual YAML documents within a YAML file or stream |
+| crate | links | description |
+| --- | --- | --- |
+| yaml2json-rs-bin |  | A command line utility to convert YAML to JSON |
+| yaml2json-rs | [![yaml2json-rs docs](https://docs.rs/yaml2json-rs/badge.svg)](https://docs.rs/yaml2json-rs/) | A library wrapping [serde-yaml](https://github.com/dtolnay/serde-yaml) and [serde-json](https://github.com/serde-rs/json) to convert a single YAML document to JSON |
+| yaml-split | [![yaml2json-rs docs](https://docs.rs/yaml-split/badge.svg)](https://docs.rs/yaml-split/) | A library providing an iterator over individual YAML documents within a YAML file or stream |
 
 ## License
 
