@@ -11,7 +11,7 @@ RUN chmod +x /tini
 
 
 FROM gcr.io/distroless/base:nonroot@sha256:2b177fbc9a31b85254d264e1fc9a65accc6636d6f1033631b9b086ee589d1fe2
-COPY --from=builder /home/rust/src/target/x86_64-unknown-linux-musl/release/yaml2json-rs-bin /yaml2json
+COPY --from=builder /home/rust/src/target/x86_64-unknown-linux-musl/release/yaml2json /yaml2json
 COPY --from=builder /tini /tini
 EXPOSE 9090
 ENTRYPOINT ["/tini", "--"]
