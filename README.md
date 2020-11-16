@@ -12,7 +12,7 @@ This implementation relies heavily on the existing work in [Serde](https://githu
 
 ## Installation
 ```
-cargo install --git https://github.com/Nessex/yaml2json-rs.git --bin yaml2json-rs-bin yaml2json
+cargo install --git https://github.com/Nessex/yaml2json-rs.git --bin yaml2json
 ```
 
 ## Usage

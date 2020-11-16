@@ -11,6 +11,10 @@ categories = ["command-line-utilities", "encoding"]
 documentation = "https://docs.rs/yaml2json-rs/"
 readme = "../../README.md"
 
+[[bin]]
+name = "yaml2json"
+path = "src/main.rs"
+
 [dependencies]
 clap = "2.33.3"
 anyhow = "1.0.34"
