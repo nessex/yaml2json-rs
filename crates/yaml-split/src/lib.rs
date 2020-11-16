@@ -196,6 +196,8 @@ impl<R: Read> Iterator for DocumentIterator<R> {
 
                     for c in buf.chars() {
                         match c {
+                            // Spaces, tabs and carriage returns don't tell us anything,
+                            // keep searching the line.
                             ' ' | '\t' | '\r' => continue,
                             // # means this line is a comment, nothing to do.
                             // \n is a newline, also nothing to do, this line didn't

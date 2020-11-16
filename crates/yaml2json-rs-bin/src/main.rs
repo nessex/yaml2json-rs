@@ -45,6 +45,7 @@ impl ToString for ErrorStyle {
     }
 }
 
+/// `ErrorPrinter` allows you to configure how errors will be printed.
 struct ErrorPrinter {
     print_style: ErrorStyle,
 }

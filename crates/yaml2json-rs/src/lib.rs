@@ -15,7 +15,7 @@ pub enum Yaml2JsonError {
     IOError(#[from] std::io::Error),
 }
 
-/// `Style`s define JSON output formats for `Yaml2Json`.
+/// `Style` defines JSON output formats for `Yaml2Json`.
 pub enum Style {
     /// `Style::COMPACT` outputs JSON on a single line.
     /// e.g. for the following YAML:
