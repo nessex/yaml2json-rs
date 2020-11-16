@@ -230,14 +230,14 @@ dependencies = [
 
 [[package]]
 name = "yaml-split"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "thiserror",
 ]
 
 [[package]]
 name = "yaml2json-rs"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "serde",
  "serde_json",
@@ -247,7 +247,7 @@ dependencies = [
 
 [[package]]
 name = "yaml2json-rs-bin"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "anyhow",
  "clap",

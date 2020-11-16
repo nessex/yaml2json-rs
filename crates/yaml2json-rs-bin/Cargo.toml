@@ -1,7 +1,7 @@
 [package]
 name = "yaml2json-rs-bin"
 description = "Command line utility to convert YAML files to JSON."
-version = "0.2.2"
+version = "0.2.3"
 authors = ["Nathan Essex <nathan@essex.id.au>"]
 edition = "2018"
 license = "Apache-2.0 OR MIT"
