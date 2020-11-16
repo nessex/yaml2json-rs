@@ -9,7 +9,7 @@ x86_64-unknown-linux-gnu
 EOF
 )
 
-  if [[ -z "${ONLY_MACOS}" ]]; then
+  if [[ -n "${ONLY_MACOS}" ]]; then
     echo "x86_64-apple-darwin"
   elif [[ -z "${EXCLUDE_MACOS}" ]]; then
     printf "%s\n%s" "${targets}" "x86_64-apple-darwin"
