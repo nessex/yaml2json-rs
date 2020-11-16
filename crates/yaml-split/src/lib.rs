@@ -33,6 +33,7 @@ pub enum YamlSplitError {
 ///
 /// ```
 /// use std::fs::File;
+/// # use std::fs::remove_file;
 /// use yaml_split::DocumentIterator;
 /// # use std::io::Write;
 /// #
@@ -46,6 +47,8 @@ pub enum YamlSplitError {
 /// for doc in doc_iter {
 ///     println!("{}", doc.unwrap());
 /// }
+///
+/// # remove_file("test.yaml").unwrap();
 /// ```
 ///
 /// This also correctly handles less common areas of the YAML spec including
