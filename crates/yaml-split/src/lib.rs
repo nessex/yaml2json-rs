@@ -104,19 +104,21 @@ impl<'a, R: Read + 'a> DocumentIterator<R> {
     /// This reader can be a reader for a file:
     /// ```
     /// use std::fs::File;
+    /// # use std::fs::remove_file;
     /// use yaml_split::DocumentIterator;
     /// # use std::io::Write;
     /// #
-    /// # File::create("test.yaml").unwrap();
-    /// # let mut file = File::open("test.yaml").unwrap();
+    /// # File::create("test.yml").unwrap();
+    /// # let mut file = File::open("test.yml").unwrap();
     /// # file.write(b"hello: world");
     ///
-    /// let read_file = File::open("test.yaml").unwrap();
+    /// let read_file = File::open("test.yml").unwrap();
     /// let doc_iter = DocumentIterator::new(read_file);
     ///
     /// for doc in doc_iter {
     ///     println!("{}", doc.unwrap());
     /// }
+    /// # remove_file("test.yml").unwrap();
     /// ```
     ///
     /// Or the reader can be a simple byte array (useful for strings):
