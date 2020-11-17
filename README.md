@@ -1,6 +1,6 @@
 # yaml2json-rs
 
-![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/nessex/yaml2json-rs?style=flat-square)
+[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/nessex/yaml2json-rs?style=flat-square)](https://hub.docker.com/r/nessex/yaml2json-rs)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/Nessex/yaml2json-rs?style=flat-square)
 ![Crates.io](https://img.shields.io/crates/l/yaml2json-rs-bin?style=flat-square)
 
