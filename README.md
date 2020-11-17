@@ -1,5 +1,9 @@
 # yaml2json-rs
 
+![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/nessex/yaml2json-rs?style=flat-square)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/Nessex/yaml2json-rs?style=flat-square)
+![Crates.io](https://img.shields.io/crates/l/yaml2json-rs-bin?style=flat-square)
+
 yaml2json-rs converts one or more YAML documents into a JSON stream.
 
 There are many implementations of this idea, with various limitations. This one aims for:
@@ -17,6 +21,11 @@ Download pre-compiled binaries from the [Releases Page](https://github.com/Nesse
 Or, install via `cargo`:
 ```
 cargo install yaml2json-rs-bin --bin yaml2json
+```
+
+Or, quickly try it out with `docker`:
+```
+echo "hello: world" | docker run -i nessex/yaml2json-rs:master
 ```
 
 ## Usage
