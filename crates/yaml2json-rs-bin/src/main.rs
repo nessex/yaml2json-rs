@@ -4,8 +4,8 @@ extern crate anyhow;
 extern crate clap;
 
 use std::fs::File;
-use std::io;
-use std::io::{Read, Write};
+use std::{io, process};
+use std::io::{Read, Stdout, Stderr};
 use std::path::Path;
 use std::str::FromStr;
 
@@ -13,7 +13,7 @@ use clap::{App, Arg};
 
 use std::error::Error;
 use yaml2json_rs::{Style, Yaml2Json};
-use yaml_split::DocumentIterator;
+use yaml_split::{DocumentIterator, YamlSplitError};
 
 enum ErrorStyle {
     SILENT,
@@ -48,58 +48,74 @@ impl ToString for ErrorStyle {
 /// `ErrorPrinter` allows you to configure how errors will be printed.
 struct ErrorPrinter {
     print_style: ErrorStyle,
+    stdout: Stdout,
+    stderr: Stderr,
 }
 
 impl ErrorPrinter {
     fn new(print_style: ErrorStyle) -> Self {
-        Self { print_style }
+        Self {
+            print_style,
+            stdout: io::stdout(),
+            stderr: io::stderr(),
+        }
     }
 
-    fn print(&self, err: impl Error) {
-        match self.print_style {
-            ErrorStyle::SILENT => {}
-            ErrorStyle::STDERR => eprintln!("{}", err),
-            ErrorStyle::JSON => println!("{{\"yaml-error\":\"{}\"}}", err),
-        };
+    fn print(&mut self, err: impl Error) {
+        self.print_string(err.to_string());
     }
 
-    fn print_string(&self, s: String) {
+    fn print_string(&mut self, s: String) {
         match self.print_style {
             ErrorStyle::SILENT => {}
-            ErrorStyle::STDERR => eprintln!("{}", s),
-            ErrorStyle::JSON => println!("{{\"yaml-error\":\"{}\"}}", s),
+            ErrorStyle::STDERR => write_or_exit(&mut self.stderr, format!("{}\n", s).as_str()),
+            ErrorStyle::JSON => write_or_exit(&mut self.stdout, format!("{{\"yaml-error\":\"{}\"}}\n", s).as_str()),
         };
     }
 }
 
-fn write(yaml2json: &Yaml2Json, ep: &ErrorPrinter, read: impl Read) {
+// `write_or_exit` is used for writing to stdout / stderr
+// as otherwise the program may panic.
+// As this program's entire purpose is to write data to stdout / stderr
+// any failure here means we should just exit cleanly with an error code.
+fn write_or_exit(io: &mut dyn io::Write, s: &str) {
+    let w = io.write(s.as_bytes());
+
+    if w.is_err() {
+        process::exit(1);
+    }
+}
+
+fn write(yaml2json: &Yaml2Json, ep: &mut ErrorPrinter, read: impl Read) {
     let doc_iter = DocumentIterator::new(read);
-    let mut first = true;
+    let mut printed_last = false;
     let mut stdout = io::stdout();
 
     for res in doc_iter {
-        if first {
-            first = false;
-        } else {
-            match stdout.write(b"\n") {
-                Ok(_) => {}
-                Err(e) => ep.print(e),
-            };
+        // print a newline between regular output lines
+        if printed_last {
+            write_or_exit(&mut stdout, "\n");
         }
 
         match res {
-            Ok(doc) => yaml2json
-                .document_to_writer(doc, &mut stdout)
-                .unwrap_or_else(|e| ep.print(e)),
-            Err(e) => ep.print(e),
+            Ok(doc) => match yaml2json.document_to_writer(doc, &mut stdout) {
+                Ok(_) => printed_last = true,
+                Err(e) => {
+                    printed_last = false;
+                    ep.print(e);
+                }
+            },
+            Err(e) => match e {
+                // If there is an IOError, we should just exit.
+                YamlSplitError::IOError(_) => process::exit(1),
+            },
         }
     }
 
-    // Add final newline
-    match stdout.write(b"\n") {
-        Ok(_) => {}
-        Err(e) => ep.print(e),
-    };
+    if printed_last {
+        // Add final newline
+        write_or_exit(&mut stdout, "\n");
+    }
 }
 
 fn main() {
@@ -141,7 +157,7 @@ fn main() {
     let pretty = matches.is_present("pretty");
     let error = matches.value_of("error").unwrap();
 
-    let ep = ErrorPrinter::new(ErrorStyle::from_str(error).unwrap());
+    let mut ep = ErrorPrinter::new(ErrorStyle::from_str(error).unwrap());
     let yaml2json_style = if pretty {
         Style::PRETTY
     } else {
@@ -166,7 +182,7 @@ fn main() {
 
                 match file {
                     Ok(f) => {
-                        write(&yaml2json, &ep, f);
+                        write(&yaml2json, &mut ep, f);
                     }
                     Err(e) => ep.print(e),
                 }
@@ -177,6 +193,6 @@ fn main() {
         let stdin = io::stdin();
         let stdin_lock = stdin.lock();
 
-        write(&yaml2json, &ep, stdin_lock);
+        write(&yaml2json, &mut ep, stdin_lock);
     }
 }
