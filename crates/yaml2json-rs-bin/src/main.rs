@@ -47,14 +47,16 @@ impl ToString for ErrorStyle {
 
 /// `ErrorPrinter` allows you to configure how errors will be printed.
 struct ErrorPrinter {
+    pretty: bool,
     print_style: ErrorStyle,
     stdout: Stdout,
     stderr: Stderr,
 }
 
 impl ErrorPrinter {
-    fn new(print_style: ErrorStyle) -> Self {
+    fn new(print_style: ErrorStyle, pretty: bool) -> Self {
         Self {
+            pretty,
             print_style,
             stdout: io::stdout(),
             stderr: io::stderr(),
@@ -69,7 +71,14 @@ impl ErrorPrinter {
         match self.print_style {
             ErrorStyle::SILENT => {}
             ErrorStyle::STDERR => write_or_exit(&mut self.stderr, format!("{}\n", s).as_str()),
-            ErrorStyle::JSON => write_or_exit(&mut self.stdout, format!("{{\"yaml-error\":\"{}\"}}\n", s).as_str()),
+            ErrorStyle::JSON => {
+                let s = if self.pretty {
+                    format!("{{\n  \"yaml-error\": \"{}\"\n}}\n", s)
+                } else {
+                    format!("{{\"yaml-error\":\"{}\"}}\n", s)
+                };
+                write_or_exit(&mut self.stdout, s.as_str());
+            },
         };
     }
 }
@@ -157,7 +166,7 @@ fn main() {
     let pretty = matches.is_present("pretty");
     let error = matches.value_of("error").unwrap();
 
-    let mut ep = ErrorPrinter::new(ErrorStyle::from_str(error).unwrap());
+    let mut ep = ErrorPrinter::new(ErrorStyle::from_str(error).unwrap(), pretty);
     let yaml2json_style = if pretty {
         Style::PRETTY
     } else {
