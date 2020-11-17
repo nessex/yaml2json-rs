@@ -230,7 +230,7 @@ dependencies = [
 
 [[package]]
 name = "yaml-split"
-version = "0.2.5"
+version = "0.2.6"
 dependencies = [
  "thiserror",
 ]
@@ -247,7 +247,7 @@ dependencies = [
 
 [[package]]
 name = "yaml2json-rs-bin"
-version = "0.2.5"
+version = "0.2.6"
 dependencies = [
  "anyhow",
  "clap",
