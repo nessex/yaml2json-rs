@@ -4,10 +4,10 @@ extern crate anyhow;
 extern crate clap;
 
 use std::fs::File;
-use std::{io, process};
-use std::io::{Read, Stdout, Stderr};
+use std::io::{Read, Stderr, Stdout};
 use std::path::Path;
 use std::str::FromStr;
+use std::{io, process};
 
 use clap::{App, Arg};
 
@@ -78,7 +78,7 @@ impl ErrorPrinter {
                     format!("{{\"yaml-error\":\"{}\"}}\n", s)
                 };
                 write_or_exit(&mut self.stdout, s.as_str());
-            },
+            }
         };
     }
 }
@@ -106,13 +106,12 @@ fn write(yaml2json: &Yaml2Json, ep: &mut ErrorPrinter, read: impl Read) {
             write_or_exit(&mut stdout, "\n");
         }
 
+        printed_last = false;
+
         match res {
             Ok(doc) => match yaml2json.document_to_writer(doc, &mut stdout) {
                 Ok(_) => printed_last = true,
-                Err(e) => {
-                    printed_last = false;
-                    ep.print(e);
-                }
+                Err(e) => ep.print(e),
             },
             Err(e) => match e {
                 // If there is an IOError, we should just exit.
