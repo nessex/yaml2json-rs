@@ -1,13 +1,13 @@
 [package]
 name = "yaml2json-rs"
 description = "Convert YAML documents to JSON"
-version = "0.2.5"
+version = "0.2.7"
 authors = ["Nathan Essex <nathan@essex.id.au>"]
 edition = "2018"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/Nessex/yaml2json-rs"
 homepage = "https://github.com/Nessex/yaml2json-rs/blob/master/crates/yaml2json-rs"
-categories = ["command-line-utilities", "encoding"]
+categories = ["encoding"]
 documentation = "https://docs.rs/yaml2json-rs/"
 
 [dependencies]
