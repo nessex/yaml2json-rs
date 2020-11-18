@@ -8,6 +8,7 @@ license = "Apache-2.0 OR MIT"
 repository = "https://github.com/Nessex/yaml2json-rs"
 homepage = "https://github.com/Nessex/yaml2json-rs/blob/master/crates/yaml-split"
 categories = ["encoding"]
+keywords = ["yaml"]
 documentation = "https://docs.rs/yaml-split/"
 
 [dependencies]

@@ -8,6 +8,7 @@ license = "Apache-2.0 OR MIT"
 repository = "https://github.com/Nessex/yaml2json-rs"
 homepage = "https://github.com/Nessex/yaml2json-rs/blob/master/crates/yaml2json-rs"
 categories = ["encoding"]
+keywords = ["yaml", "json"]
 documentation = "https://docs.rs/yaml2json-rs/"
 
 [dependencies]
