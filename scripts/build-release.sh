@@ -1,12 +1,11 @@
 #!/bin/bash
 
 repo_root=$(git rev-parse --show-toplevel)
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-source "${DIR}/targets.sh"
+source "${repo_root}/scripts/targets.sh"
 
 targets=$(get_targets)
 
-version=$(cargo workspaces list --json | jq -r '.[] | select(.name=="yaml2json-rs-bin") | .version')
+version=$(grep --max-count=1 'version\ ' < 'crates/yaml2json-rs-bin/Cargo.toml' | cut -d' ' -f 3 | tr -d '"')
 version_dir="${repo_root}/target/versions/${version}"
 
 mkdir -p "${version_dir}"
@@ -35,9 +34,13 @@ build_target() {
         ;;
     esac
 
+    if command -v strip 1>/dev/null; then
+      strip "${filename}"
+    fi
+
     out="yaml2json-rs-v${version}-${target}.${extension}"
 
-    atool -a "${out}" "${filename}"
+    atool -qa "${out}" "${filename}"
     mv "${out}" "${version_dir}/${out}"
   )
 }

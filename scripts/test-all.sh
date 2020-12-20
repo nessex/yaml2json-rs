@@ -2,8 +2,8 @@
 
 # Output is silent, unless there are errors
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-source "${DIR}/targets.sh"
+repo_root=$(git rev-parse --show-toplevel)
+source "${repo_root}/scripts/targets.sh"
 
 targets=$(get_targets)
 
