@@ -62,9 +62,9 @@ find . -name '*.yaml' -exec yaml2json {} +
 
 | crate | links | description |
 | --- | --- | --- |
-| yaml2json-rs-bin |  | A command line utility to convert YAML to JSON |
-| yaml2json-rs | [![yaml2json-rs docs](https://docs.rs/yaml2json-rs/badge.svg)](https://docs.rs/yaml2json-rs/) | A library wrapping [serde-yaml](https://github.com/dtolnay/serde-yaml) and [serde-json](https://github.com/serde-rs/json) to convert a single YAML document to JSON |
-| yaml-split | [![yaml2json-rs docs](https://docs.rs/yaml-split/badge.svg)](https://docs.rs/yaml-split/) | A library providing an iterator over individual YAML documents within a YAML file or stream |
+| [yaml2json-rs-bin](https://crates.io/crates/yaml2json-rs-bin) |  | A command line utility to convert YAML to JSON |
+| [yaml2json-rs](https://crates.io/crates/yaml2json-rs) | [![yaml2json-rs docs](https://docs.rs/yaml2json-rs/badge.svg)](https://docs.rs/yaml2json-rs/) | A library wrapping [serde-yaml](https://github.com/dtolnay/serde-yaml) and [serde-json](https://github.com/serde-rs/json) to convert a single YAML document to JSON |
+| [yaml-split](https://crates.io/crates/yaml-split) | [![yaml2json-rs docs](https://docs.rs/yaml-split/badge.svg)](https://docs.rs/yaml-split/) | A library providing an iterator over individual YAML documents within a YAML file or stream |
 
 ## License
 
