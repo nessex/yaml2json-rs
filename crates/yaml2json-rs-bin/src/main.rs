@@ -11,7 +11,6 @@ use std::{io, process};
 
 use clap::{App, Arg};
 
-use std::error::Error;
 use std::fmt::Display;
 use yaml2json_rs::{Style, Yaml2Json};
 use yaml_split::{DocumentIterator, YamlSplitError};
