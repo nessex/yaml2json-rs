@@ -161,9 +161,9 @@ impl<R: Read> Iterator for DocumentIterator<R> {
     type Item = Result<String, YamlSplitError>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let mut buf: String;
+        let mut buf = String::new();
         let mut current_file = match &self.prepend_next {
-            Some(next) => String::new() + next.as_str(),
+            Some(next) => next.clone(),
             None => String::new(),
         };
         self.prepend_next = None;
@@ -186,7 +186,7 @@ impl<R: Read> Iterator for DocumentIterator<R> {
             }
 
             // Empty the buffer. read_line appends, and we don't want that.
-            buf = String::new();
+            buf.clear();
 
             match self.reader.read_line(&mut buf) {
                 Ok(l) => {
@@ -221,7 +221,7 @@ impl<R: Read> Iterator for DocumentIterator<R> {
                     }
 
                     // Append the current line to the document
-                    current_file = String::new() + current_file.as_str() + buf.as_str();
+                    current_file = current_file + &buf;
                 }
                 Err(e) => {
                     return Some(Err(e.into()));
@@ -233,7 +233,7 @@ impl<R: Read> Iterator for DocumentIterator<R> {
         // parse the rest of the YAML. In this loop we will look for the start and end of documents
         // as our YAML parser does not support parsing multiple documents at once.
         loop {
-            buf = String::new();
+            buf.clear();
 
             match self.reader.read_line(&mut buf) {
                 Ok(l) => {
@@ -269,7 +269,7 @@ impl<R: Read> Iterator for DocumentIterator<R> {
                         self.in_header = false;
                     }
 
-                    current_file = String::new() + current_file.as_str() + buf.as_str();
+                    current_file = current_file + &buf;
                 }
                 Err(e) => {
                     return Some(Err(e.into()));
