@@ -12,4 +12,4 @@ keywords = ["yaml"]
 documentation = "https://docs.rs/yaml-split/"
 
 [dependencies]
-thiserror = "1.0.22"
+thiserror = "1.0.26"
