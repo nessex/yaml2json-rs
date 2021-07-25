@@ -296,7 +296,7 @@ mod tests {
         let mut doc_iter = DocumentIterator::new(reader);
 
         let next = doc_iter.next().unwrap().unwrap();
-        assert_eq!(next.as_str(), "abc: def");
+        assert_eq!(&next, "abc: def");
 
         let fin = doc_iter.next().is_none();
         assert_eq!(true, fin);
@@ -314,7 +314,7 @@ abc: def
 
         let next = doc_iter.next().unwrap().unwrap();
         assert_eq!(
-            next.as_str(),
+            &next,
             r#"
 ---
 abc: def
@@ -338,7 +338,7 @@ abc: def
 
         let next = doc_iter.next().unwrap().unwrap();
         assert_eq!(
-            next.as_str(),
+            &next,
             r#"
 %YAML 1.2
 ---
@@ -361,11 +361,11 @@ aaa: bbb
         let mut doc_iter = DocumentIterator::new(reader);
 
         let mut next = doc_iter.next().unwrap().unwrap();
-        assert_eq!(next.as_str(), "abc: def\n");
+        assert_eq!(&next, "abc: def\n");
 
         next = doc_iter.next().unwrap().unwrap();
         assert_eq!(
-            next.as_str(),
+            &next,
             r#"---
 aaa: bbb
 "#
@@ -392,7 +392,7 @@ aaa: bbb
 
         let mut next = doc_iter.next().unwrap().unwrap();
         assert_eq!(
-            next.as_str(),
+            &next,
             r#"%YAML 1.2
 ---
 abc: def
@@ -401,7 +401,7 @@ abc: def
 
         next = doc_iter.next().unwrap().unwrap();
         assert_eq!(
-            next.as_str(),
+            &next,
             r#"
 %YAML 1.2
 ---
@@ -434,7 +434,7 @@ final: "document"
 
         let mut next = doc_iter.next().unwrap().unwrap();
         assert_eq!(
-            next.as_str(),
+            &next,
             r#"%YAML 1.2
 ---
 abc: def
@@ -443,14 +443,14 @@ abc: def
 
         next = doc_iter.next().unwrap().unwrap();
         assert_eq!(
-            next.as_str(),
+            &next,
             r#"---
 %YAML: "not a real directive"
 "#
         );
         next = doc_iter.next().unwrap().unwrap();
         assert_eq!(
-            next.as_str(),
+            &next,
             r#"---
 aaa: bbb
 "#
@@ -458,14 +458,14 @@ aaa: bbb
 
         next = doc_iter.next().unwrap().unwrap();
         assert_eq!(
-            next.as_str(),
+            &next,
             r#"---
 "#
         );
 
         next = doc_iter.next().unwrap().unwrap();
         assert_eq!(
-            next.as_str(),
+            &next,
             r#"---
 final: "document"
 "#

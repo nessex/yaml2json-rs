@@ -12,6 +12,7 @@ use std::{io, process};
 use clap::{App, Arg};
 
 use std::error::Error;
+use std::fmt::Display;
 use yaml2json_rs::{Style, Yaml2Json};
 use yaml_split::{DocumentIterator, YamlSplitError};
 
@@ -63,21 +64,17 @@ impl ErrorPrinter {
         }
     }
 
-    fn print(&mut self, err: impl Error) {
-        self.print_string(err.to_string());
-    }
-
-    fn print_string(&mut self, s: String) {
+    fn print(&mut self, d: impl Display) {
         match self.print_style {
             ErrorStyle::SILENT => {}
-            ErrorStyle::STDERR => write_or_exit(&mut self.stderr, format!("{}\n", s).as_str()),
+            ErrorStyle::STDERR => write_or_exit(&mut self.stderr, &format!("{}\n", d)),
             ErrorStyle::JSON => {
                 let s = if self.pretty {
-                    format!("{{\n  \"yaml-error\": \"{}\"\n}}\n", s)
+                    format!("{{\n  \"yaml-error\": \"{}\"\n}}\n", d)
                 } else {
-                    format!("{{\"yaml-error\":\"{}\"}}\n", s)
+                    format!("{{\"yaml-error\":\"{}\"}}\n", d)
                 };
-                write_or_exit(&mut self.stdout, s.as_str());
+                write_or_exit(&mut self.stdout, &s);
             }
         };
     }
@@ -109,7 +106,7 @@ fn write(yaml2json: &Yaml2Json, ep: &mut ErrorPrinter, read: impl Read) {
         printed_last = false;
 
         match res {
-            Ok(doc) => match yaml2json.document_to_writer(doc, &mut stdout) {
+            Ok(doc) => match yaml2json.document_to_writer(&doc, &mut stdout) {
                 Ok(_) => printed_last = true,
                 Err(e) => ep.print(e),
             },
@@ -149,10 +146,10 @@ fn main() {
                 .takes_value(true)
                 .short("e")
                 .long("error")
-                .default_value(default_err_style.as_str())
-                .possible_value(ErrorStyle::SILENT.to_string().as_str())
-                .possible_value(ErrorStyle::STDERR.to_string().as_str())
-                .possible_value(ErrorStyle::JSON.to_string().as_str())
+                .default_value(&default_err_style)
+                .possible_value(&ErrorStyle::SILENT.to_string())
+                .possible_value(&ErrorStyle::STDERR.to_string())
+                .possible_value(&ErrorStyle::JSON.to_string())
         )
         .arg(
             Arg::with_name("file")
@@ -179,19 +176,14 @@ fn main() {
             let path = Path::new(f);
 
             if !path.exists() {
-                ep.print_string(format!(
-                    "file {} does not exist",
-                    path.display().to_string()
-                ));
+                ep.print(format!("file {} does not exist", path.display()));
             } else if path.is_dir() {
-                ep.print_string(format!("{} is a directory", path.display().to_string()))
+                ep.print(format!("{} is a directory", path.display()))
             } else {
                 let file = File::open(f);
 
                 match file {
-                    Ok(f) => {
-                        write(&yaml2json, &mut ep, f);
-                    }
+                    Ok(f) => write(&yaml2json, &mut ep, f),
                     Err(e) => ep.print(e),
                 }
             }

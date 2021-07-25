@@ -67,7 +67,7 @@ pub enum Style {
 /// use yaml2json_rs::{Yaml2Json, Style};
 ///
 /// let y2j = Yaml2Json::new(Style::COMPACT);
-/// let input = String::from("hello: world");
+/// let input = "hello: world";
 /// let output = y2j.document_to_string(input).unwrap();
 ///
 /// assert_eq!(output, r#"{"hello":"world"}"#);
@@ -79,7 +79,7 @@ pub enum Style {
 /// use std::io;
 ///
 /// let y2j = Yaml2Json::new(Style::COMPACT);
-/// let input = String::from("hello: world");
+/// let input = "hello: world";
 /// let mut stdout = io::stdout();
 ///
 /// y2j.document_to_writer(input, &mut stdout);
@@ -102,18 +102,18 @@ impl Yaml2Json {
         Self { style }
     }
 
-    /// `document_to_string()` takes a YAML document String and converts it to a JSON String.
+    /// `document_to_string()` takes a YAML document &str and converts it to a JSON String.
     /// ```
     /// use yaml2json_rs::{Yaml2Json, Style};
     ///
     /// let y2j = Yaml2Json::new(Style::COMPACT);
-    /// let input = String::from("hello: world");
+    /// let input = "hello: world";
     /// let output = y2j.document_to_string(input).unwrap();
     ///
     /// assert_eq!(output, r#"{"hello":"world"}"#);
     /// ```
-    pub fn document_to_string(&self, document: String) -> Result<String, Yaml2JsonError> {
-        let s: serde_json::Value = serde_yaml::from_str(document.as_str())?;
+    pub fn document_to_string(&self, document: &str) -> Result<String, Yaml2JsonError> {
+        let s: serde_json::Value = serde_yaml::from_str(document)?;
 
         let res = match self.style {
             COMPACT => serde_json::to_string(&s),
@@ -134,7 +134,7 @@ impl Yaml2Json {
     /// use std::io;
     ///
     /// let y2j = Yaml2Json::new(Style::COMPACT);
-    /// let input = String::from("hello: world");
+    /// let input = "hello: world";
     /// let mut stdout = io::stdout();
     ///
     /// y2j.document_to_writer(input, &mut stdout);
@@ -143,10 +143,10 @@ impl Yaml2Json {
     /// ```
     pub fn document_to_writer<W: io::Write>(
         &self,
-        document: String,
+        document: &str,
         w: &mut W,
     ) -> Result<(), Yaml2JsonError> {
-        let s: serde_json::Value = serde_yaml::from_str(document.as_str())?;
+        let s: serde_json::Value = serde_yaml::from_str(document)?;
 
         let res = match self.style {
             PRETTY => serde_json::to_writer_pretty(w, &s),
@@ -168,12 +168,11 @@ mod tests {
     #[test]
     fn document_to_string_compact() {
         let yaml2json = Yaml2Json::new(Style::COMPACT);
-        let input = String::new()
-            + r#"
+        let input = r#"
 ---
 abc: def
 "#;
-        let expected = String::new() + r#"{"abc":"def"}"#;
+        let expected = r#"{"abc":"def"}"#;
         let res = yaml2json.document_to_string(input).unwrap();
         assert_eq!(expected, res);
     }
@@ -181,13 +180,11 @@ abc: def
     #[test]
     fn document_to_string_pretty() {
         let yaml2json = Yaml2Json::new(Style::PRETTY);
-        let input = String::new()
-            + r#"
+        let input = r#"
 ---
 abc: def
 "#;
-        let expected = String::new()
-            + r#"{
+        let expected = r#"{
   "abc": "def"
 }"#;
         let res = yaml2json.document_to_string(input).unwrap();
@@ -197,12 +194,11 @@ abc: def
     #[test]
     fn document_to_writer_compact() {
         let yaml2json = Yaml2Json::new(Style::COMPACT);
-        let input = String::new()
-            + r#"
+        let input = r#"
 ---
 abc: def
 "#;
-        let expected = String::new() + r#"{"abc":"def"}"#;
+        let expected = r#"{"abc":"def"}"#;
 
         let mut buf = Cursor::new(Vec::<u8>::new());
         yaml2json.document_to_writer(input, buf.get_mut()).unwrap();
@@ -214,13 +210,11 @@ abc: def
     #[test]
     fn document_to_writer_pretty() {
         let yaml2json = Yaml2Json::new(Style::PRETTY);
-        let input = String::new()
-            + r#"
+        let input = r#"
 ---
 abc: def
 "#;
-        let expected = String::new()
-            + r#"{
+        let expected = r#"{
   "abc": "def"
 }"#;
 
