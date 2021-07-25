@@ -18,6 +18,6 @@ path = "src/main.rs"
 
 [dependencies]
 clap = "2.33.3"
-anyhow = "1.0.38"
+anyhow = "1.0.42"
 yaml-split = { path = "../yaml-split", version = "=0.3.1" }
 yaml2json-rs = { path = "../yaml2json-rs", version = "=0.3.1" }
