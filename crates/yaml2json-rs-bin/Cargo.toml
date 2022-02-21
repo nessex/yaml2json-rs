@@ -17,7 +17,7 @@ name = "yaml2json"
 path = "src/main.rs"
 
 [dependencies]
-clap = "2.33.3"
+clap = "3.1.1"
 anyhow = "1.0.43"
 yaml-split = { path = "../yaml-split", version = "=0.3.2" }
 yaml2json-rs = { path = "../yaml2json-rs", version = "=0.3.2" }
