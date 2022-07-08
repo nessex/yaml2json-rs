@@ -56,12 +56,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dtoa"
-version = "0.4.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "134951f4028bdadb9b84baf4232681efbf277da25144b9b0ad65df75946c422b"
-
-[[package]]
 name = "hashbrown"
 version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -147,12 +141,12 @@ dependencies = [
 
 [[package]]
 name = "serde_yaml"
-version = "0.8.20"
+version = "0.8.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad104641f3c958dab30eb3010e834c2622d1f3f4c530fef1dee20ad9485f3c09"
+checksum = "1ec0091e1f5aa338283ce049bd9dfefd55e1f168ac233e85c1ffe0038fb48cbe"
 dependencies = [
- "dtoa",
  "indexmap",
+ "ryu",
  "serde",
  "yaml-rust",
 ]
