@@ -16,9 +16,9 @@ use yaml2json_rs::{Style, Yaml2Json};
 use yaml_split::{DocumentIterator, YamlSplitError};
 
 enum ErrorStyle {
-    SILENT,
-    STDERR,
-    JSON,
+    Silent,
+    Stderr,
+    Json,
 }
 
 impl FromStr for ErrorStyle {
@@ -26,9 +26,9 @@ impl FromStr for ErrorStyle {
 
     fn from_str(s: &str) -> core::result::Result<Self, Self::Err> {
         match s {
-            "silent" => Ok(ErrorStyle::SILENT),
-            "stderr" => Ok(ErrorStyle::STDERR),
-            "json" => Ok(ErrorStyle::JSON),
+            "silent" => Ok(ErrorStyle::Silent),
+            "stderr" => Ok(ErrorStyle::Stderr),
+            "json" => Ok(ErrorStyle::Json),
             _ => bail!("not a valid ErrorStyle"),
         }
     }
@@ -37,9 +37,9 @@ impl FromStr for ErrorStyle {
 impl ToString for ErrorStyle {
     fn to_string(&self) -> String {
         match self {
-            ErrorStyle::SILENT => "silent",
-            ErrorStyle::STDERR => "stderr",
-            ErrorStyle::JSON => "json",
+            ErrorStyle::Silent => "silent",
+            ErrorStyle::Stderr => "stderr",
+            ErrorStyle::Json => "json",
         }
         .to_string()
     }
@@ -65,9 +65,9 @@ impl ErrorPrinter {
 
     fn print(&mut self, d: impl Display) {
         match self.print_style {
-            ErrorStyle::SILENT => {}
-            ErrorStyle::STDERR => write_or_exit(&mut self.stderr, &format!("{}\n", d)),
-            ErrorStyle::JSON => {
+            ErrorStyle::Silent => {}
+            ErrorStyle::Stderr => write_or_exit(&mut self.stderr, &format!("{}\n", d)),
+            ErrorStyle::Json => {
                 let s = if self.pretty {
                     format!("{{\n  \"yaml-error\": \"{}\"\n}}\n", d)
                 } else {
@@ -123,7 +123,7 @@ fn write(yaml2json: &Yaml2Json, ep: &mut ErrorPrinter, read: impl Read) {
 }
 
 fn main() {
-    let default_err_style = ErrorStyle::STDERR.to_string();
+    let default_err_style = ErrorStyle::Stderr.to_string();
     let usage = r#"./yaml2json file1.yaml file2.yaml
 
     cat file1.yaml | ./yaml2json
@@ -146,9 +146,9 @@ fn main() {
                 .short("e")
                 .long("error")
                 .default_value(&default_err_style)
-                .possible_value(&ErrorStyle::SILENT.to_string())
-                .possible_value(&ErrorStyle::STDERR.to_string())
-                .possible_value(&ErrorStyle::JSON.to_string())
+                .possible_value(&ErrorStyle::Silent.to_string())
+                .possible_value(&ErrorStyle::Stderr.to_string())
+                .possible_value(&ErrorStyle::Json.to_string())
         )
         .arg(
             Arg::with_name("file")
