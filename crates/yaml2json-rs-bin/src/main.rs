@@ -1,20 +1,17 @@
-#[macro_use]
-extern crate anyhow;
-#[macro_use]
-extern crate clap;
-
 use std::fs::File;
 use std::io::{Read, Stderr, Stdout};
 use std::path::Path;
 use std::str::FromStr;
 use std::{io, process};
 
-use clap::{App, Arg};
+use clap::{crate_authors, crate_description, crate_name, crate_version, App, Arg};
 
-use std::fmt::Display;
+use anyhow::bail;
+use std::fmt::{Display, Formatter};
 use yaml2json_rs::{Style, Yaml2Json};
 use yaml_split::{DocumentIterator, YamlSplitError};
 
+#[derive(Clone, clap::ValueEnum)]
 enum ErrorStyle {
     Silent,
     Stderr,
@@ -24,7 +21,7 @@ enum ErrorStyle {
 impl FromStr for ErrorStyle {
     type Err = anyhow::Error;
 
-    fn from_str(s: &str) -> core::result::Result<Self, Self::Err> {
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "silent" => Ok(ErrorStyle::Silent),
             "stderr" => Ok(ErrorStyle::Stderr),
@@ -34,14 +31,17 @@ impl FromStr for ErrorStyle {
     }
 }
 
-impl ToString for ErrorStyle {
-    fn to_string(&self) -> String {
-        match self {
-            ErrorStyle::Silent => "silent",
-            ErrorStyle::Stderr => "stderr",
-            ErrorStyle::Json => "json",
-        }
-        .to_string()
+impl Display for ErrorStyle {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                ErrorStyle::Silent => "silent",
+                ErrorStyle::Stderr => "stderr",
+                ErrorStyle::Json => "json",
+            }
+        )
     }
 }
 
@@ -123,7 +123,6 @@ fn write(yaml2json: &Yaml2Json, ep: &mut ErrorPrinter, read: impl Read) {
 }
 
 fn main() {
-    let default_err_style = ErrorStyle::Stderr.to_string();
     let usage = r#"./yaml2json file1.yaml file2.yaml
 
     cat file1.yaml | ./yaml2json
@@ -137,18 +136,15 @@ fn main() {
         .arg(
             Arg::with_name("pretty")
                 .takes_value(false)
-                .short("p")
+                .short('p')
                 .long("pretty")
         )
         .arg(
             Arg::with_name("error")
                 .takes_value(true)
-                .short("e")
+                .short('e')
                 .long("error")
-                .default_value(&default_err_style)
-                .possible_value(&ErrorStyle::Silent.to_string())
-                .possible_value(&ErrorStyle::Stderr.to_string())
-                .possible_value(&ErrorStyle::Json.to_string())
+                .default_value("json")
         )
         .arg(
             Arg::with_name("file")
@@ -159,9 +155,13 @@ fn main() {
 
     let fileopt = matches.values_of("file");
     let pretty = matches.is_present("pretty");
-    let error = matches.value_of("error").unwrap();
+    let error: ErrorStyle = matches
+        .value_of("error")
+        .unwrap()
+        .parse()
+        .expect(r#"invalid error value, expected one of "silent", "stderr" or "json""#);
 
-    let mut ep = ErrorPrinter::new(ErrorStyle::from_str(error).unwrap(), pretty);
+    let mut ep = ErrorPrinter::new(error, pretty);
     let yaml2json_style = if pretty {
         Style::PRETTY
     } else {
