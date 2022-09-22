@@ -36,10 +36,12 @@ pub enum YamlSplitError {
 /// # use std::fs::remove_file;
 /// use yaml_split::DocumentIterator;
 /// # use std::io::Write;
-/// #
-/// # File::create("test.yaml").unwrap();
-/// # let mut file = File::open("test.yaml").unwrap();
-/// # file.write(b"hello: world");
+/// let mut file = File::options()
+///     .create(true)
+///     .write(true)
+///     .open("test.yaml")
+///     .unwrap()
+///     .write(b"hello: world");
 ///
 /// let read_file = File::open("test.yaml").unwrap();
 /// let doc_iter = DocumentIterator::new(read_file);
@@ -107,10 +109,12 @@ impl<'a, R: Read + 'a> DocumentIterator<R> {
     /// # use std::fs::remove_file;
     /// use yaml_split::DocumentIterator;
     /// # use std::io::Write;
-    /// #
-    /// # File::create("test.yml").unwrap();
-    /// # let mut file = File::open("test.yml").unwrap();
-    /// # file.write(b"hello: world");
+    /// let mut file = File::options()
+    ///     .create(true)
+    ///     .write(true)
+    ///     .open("test.yml")
+    ///     .unwrap()
+    ///     .write(b"hello: world");
     ///
     /// let read_file = File::open("test.yml").unwrap();
     /// let doc_iter = DocumentIterator::new(read_file);

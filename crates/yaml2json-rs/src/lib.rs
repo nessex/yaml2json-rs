@@ -12,7 +12,7 @@ pub enum Yaml2JsonError {
     SerdeJsonError(#[from] serde_json::Error),
 
     #[error(transparent)]
-    IOError(#[from] std::io::Error),
+    IOError(#[from] io::Error),
 }
 
 /// `Style` defines JSON output formats for `Yaml2Json`.
@@ -82,7 +82,7 @@ pub enum Style {
 /// let input = "hello: world";
 /// let mut stdout = io::stdout();
 ///
-/// y2j.document_to_writer(input, &mut stdout);
+/// y2j.document_to_writer(input, &mut stdout).unwrap();
 ///
 /// // {"hello":"world"}
 /// ```
@@ -137,7 +137,7 @@ impl Yaml2Json {
     /// let input = "hello: world";
     /// let mut stdout = io::stdout();
     ///
-    /// y2j.document_to_writer(input, &mut stdout);
+    /// y2j.document_to_writer(input, &mut stdout).unwrap();
     ///
     /// // {"hello":"world"}
     /// ```
