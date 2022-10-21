@@ -14,5 +14,5 @@ documentation = "https://docs.rs/yaml2json-rs/"
 [dependencies]
 serde = "1.0.144"
 serde_json = "1.0.85"
-serde_yaml = "0.9.13"
+serde_yaml = "0.9.14"
 thiserror = "1.0.35"
